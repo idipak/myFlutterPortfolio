@@ -3,7 +3,6 @@ import 'dart:math';
 import 'animation_package.dart';
 import 'home_object.dart';
 
-
 class ParticleBackgroundPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -11,7 +10,10 @@ class ParticleBackgroundPage extends StatelessWidget {
       children: <Widget>[
         Positioned.fill(child: AnimatedBackground()),
         Positioned.fill(child: Particles(30)),
-        Positioned.fill(child: CenteredObject()),
+        Positioned.fill(
+            child: SingleChildScrollView(
+          child: CenteredObject(),
+        )),
       ],
     );
   }
@@ -140,4 +142,3 @@ class AnimatedBackground extends StatelessWidget {
     );
   }
 }
-
