@@ -22,12 +22,12 @@ import 'package:flutter/scheduler.dart';
 /// [startTimeSimulationTicks] property.)
 class Rendering extends StatefulWidget {
   final Widget Function(BuildContext context, Duration timeElapsed) builder;
-  final Function(Duration timeElapsed) onTick;
+  final Function(Duration timeElapsed)? onTick;
   final Duration startTime;
   final int startTimeSimulationTicks;
 
   Rendering(
-      {this.builder,
+      {required this.builder,
       this.onTick,
       this.startTime = Duration.zero,
       this.startTimeSimulationTicks = 20})
@@ -39,7 +39,7 @@ class Rendering extends StatefulWidget {
 
 class _RenderingState extends State<Rendering>
     with SingleTickerProviderStateMixin {
-  Ticker _ticker;
+  late Ticker _ticker;
   Duration _timeElapsed = Duration(milliseconds: 0);
 
   @override
@@ -57,7 +57,7 @@ class _RenderingState extends State<Rendering>
 
   void _onRender(Duration effectiveElapsed) {
     if (widget.onTick != null) {
-      widget.onTick(effectiveElapsed);
+      widget.onTick!(effectiveElapsed);
     }
     setState(() {
       _timeElapsed = effectiveElapsed;
@@ -72,7 +72,7 @@ class _RenderingState extends State<Rendering>
                     i /
                     widget.startTimeSimulationTicks)
                 .round());
-        widget.onTick(simulatedTime);
+        widget.onTick!(simulatedTime);
       });
     }
   }
@@ -188,8 +188,8 @@ class MultiTrackTween extends Animatable<Map<String, dynamic>> {
   Map<String, dynamic> transform(double t) {
     final Map<String, dynamic> result = Map();
     _tracksToTween.forEach((name, tweenData) {
-      final double tTween = max(0, min(t, tweenData.maxTime - 0.0001));
-      result[name] = tweenData.tween.transform(tTween);
+      final double tTween = max(0, min(t, tweenData.maxTime! - 0.0001));
+      result[name] = tweenData.tween!.transform(tTween);
     });
     return result;
   }
@@ -209,7 +209,7 @@ class Track<T> {
   ///
   /// Optionally you can set a named parameter [curve] that applies an easing
   /// curve to the tween.
-  Track<T> add(Duration duration, Animatable<T> tween, {Curve curve}) {
+  Track<T> add(Duration duration, Animatable<T> tween, {Curve? curve}) {
     items.add(_TrackItem(duration, tween, curve: curve));
     return this;
   }
@@ -217,9 +217,9 @@ class Track<T> {
 
 class _TrackItem<T> {
   final Duration duration;
-  Animatable<T> tween;
+  late Animatable<T> tween;
 
-  _TrackItem(this.duration, Animatable<T> _tween, {Curve curve})
+  _TrackItem(this.duration, Animatable<T> _tween, {Curve? curve})
       : assert(duration != null, "Please set a duration."),
         assert(_tween != null, "Please set a tween.") {
     if (curve != null) {
@@ -231,8 +231,8 @@ class _TrackItem<T> {
 }
 
 class _TweenData<T> {
-  final Animatable<T> tween;
-  final double maxTime;
+  final Animatable<T>? tween;
+  final double? maxTime;
 
   _TweenData({this.tween, this.maxTime});
 }
@@ -305,26 +305,26 @@ class ControlledAnimation<T> extends StatefulWidget {
   final Animatable<T> tween;
   final Curve curve;
   final Duration duration;
-  final Duration delay;
-  final Widget Function(BuildContext buildContext, T animatedValue) builder;
-  final Widget Function(BuildContext, Widget child, T animatedValue)
+  final Duration? delay;
+  final Widget Function(BuildContext buildContext, T animatedValue)? builder;
+  final Widget Function(BuildContext, Widget? child, T animatedValue)?
       builderWithChild;
-  final Widget child;
-  final AnimationStatusListener animationControllerStatusListener;
+  final Widget? child;
+  final AnimationStatusListener? animationControllerStatusListener;
   final double startPosition;
 
   ControlledAnimation(
       {this.playback = Playback.PLAY_FORWARD,
-      this.tween,
+      required this.tween,
       this.curve = Curves.linear,
-      this.duration,
+      required this.duration,
       this.delay,
       this.builder,
       this.builderWithChild,
       this.child,
       this.animationControllerStatusListener,
       this.startPosition = 0.0,
-      Key key})
+      Key? key})
       : assert(duration != null,
             "Please set property duration. Example: Duration(milliseconds: 500)"),
         assert(tween != null,
@@ -346,8 +346,8 @@ class ControlledAnimation<T> extends StatefulWidget {
 
 class _ControlledAnimationState<T> extends State<ControlledAnimation>
     with SingleTickerProviderStateMixin {
-  AnimationController _controller;
-  Animation<T> _animation;
+  late AnimationController _controller;
+  late Animation<T?> _animation;
   bool _isDisposed = false;
   bool _waitForDelay = true;
   bool _isCurrentlyMirroring = false;
@@ -362,10 +362,10 @@ class _ControlledAnimationState<T> extends State<ControlledAnimation>
 
     _animation = widget.tween
         .chain(CurveTween(curve: widget.curve))
-        .animate(_controller);
+        .animate(_controller) as Animation<T?>;
 
     if (widget.animationControllerStatusListener != null) {
-      _controller.addStatusListener(widget.animationControllerStatusListener);
+      _controller.addStatusListener(widget.animationControllerStatusListener!);
     }
 
     initialize();
@@ -374,7 +374,7 @@ class _ControlledAnimationState<T> extends State<ControlledAnimation>
 
   void initialize() async {
     if (widget.delay != null) {
-      await Future.delayed(widget.delay);
+      await Future.delayed(widget.delay!);
     }
     _waitForDelay = false;
     executeInstruction();
@@ -423,9 +423,9 @@ class _ControlledAnimationState<T> extends State<ControlledAnimation>
   @override
   Widget build(BuildContext context) {
     if (widget.builder != null) {
-      return widget.builder(context, _animation.value);
+      return widget.builder!(context, _animation.value);
     } else if (widget.builderWithChild != null && widget.child != null) {
-      return widget.builderWithChild(context, widget.child, _animation.value);
+      return widget.builderWithChild!(context, widget.child, _animation.value);
     }
     _controller.stop(canceled: true);
     throw FlutterError(
@@ -452,7 +452,7 @@ class AnimationProgress {
   final Duration startTime;
 
   /// Creates an [AnimationProgress].
-  AnimationProgress({this.duration, this.startTime})
+  AnimationProgress({required this.duration, required this.startTime})
       : assert(duration != null, "Please specify an animation duration."),
         assert(
             startTime != null, "Please specify a start time of the animation.");

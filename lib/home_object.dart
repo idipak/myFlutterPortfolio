@@ -4,7 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class CenteredObject extends StatelessWidget {
   const CenteredObject({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override

@@ -12,7 +12,9 @@ class ParticleBackgroundPage extends StatelessWidget {
         Positioned.fill(child: Particles(30)),
         Positioned.fill(
             child: SingleChildScrollView(
-          child: CenteredObject(),
+          child: Center(
+            child: CenteredObject(),
+          ),
         )),
       ],
     );
@@ -60,9 +62,9 @@ class _ParticlesState extends State<Particles> {
 }
 
 class ParticleModel {
-  Animatable tween;
-  double size;
-  AnimationProgress animationProgress;
+  late Animatable tween;
+  late double size;
+  late AnimationProgress animationProgress;
   Random random;
 
   ParticleModel(this.random) {
@@ -130,7 +132,7 @@ class AnimatedBackground extends StatelessWidget {
       playback: Playback.MIRROR,
       tween: tween,
       duration: tween.duration,
-      builder: (context, animation) {
+      builder: (context, dynamic animation) {
         return Container(
           decoration: BoxDecoration(
               gradient: LinearGradient(
