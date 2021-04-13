@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'background.dart';
+import 'package:myapp/screens/home.dart';
 
 void main() {
   runApp(MyApp());
@@ -11,9 +11,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Dipak Prasad',
-      home: Scaffold(
-        body: ParticleBackgroundPage(),
-        ),
+      home: Home(),
     );
   }
 }

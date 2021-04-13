@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'animation_package.dart';
-import 'home_object.dart';
+import '../home_object.dart';
 
 class ParticleBackgroundPage extends StatelessWidget {
   @override

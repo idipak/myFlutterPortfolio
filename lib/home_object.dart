@@ -74,7 +74,7 @@ class CenteredObject extends StatelessWidget {
                 )),
           ),
         ),
-        RaisedButton(
+        MaterialButton(
           elevation: 6,
           color: Colors.indigoAccent,
           child: Text(
